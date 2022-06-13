@@ -2,15 +2,59 @@ REDRESS_DATA <- read_csv("C:/Users/lucas/Desktop/RedCap/REDRESS_DATA_2022-06-10_
 
 hw_tool <- read_csv("C:/Users/lucas/Desktop/RedCap/REDRESS_DATA_LABELS_2022-06-10_2231.csv")
 
-variable.names(hw_tool)
 
-variable.names(REDRESS_DATA)
+hw_tool_no_ids <- hw_tool %>% select(-c(1,5))
 
+
+hw_distinct<-hw_tool_no_ids %>% distinct() # 345
+
+hw_distinct<-hw_distinct[rowSums(!is.na(hw_distinct))>=3,]
+
+
+##
+
+hw_distinct$health_facility<- gsub('[[:digit:]]+', '',hw_distinct$`II.  Facility name`)
+
+hw_distinct$health_facility<- gsub('.\t', '',hw_distinct$health_facility)
+
+hw_distinct$District<- gsub('[[:digit:]]+', '',hw_distinct$`V.  Health district`)
+
+hw_distinct$District<- str_trim(hw_distinct$District)
+
+hw_distinct$District<- str_remove(hw_distinct$District," District")
+
+hw_distinct$County<- gsub('[[:digit:]]+', '',hw_distinct$`IV.  County`)
+
+hw_distinct$County<- str_trim(hw_distinct$County)
+
+
+hw_distinct %>% filter (is.na(County))
+
+hw_distinct <- hw_distinct %>% mutate (County = case_when(is.na(County) ~ "Lofa",
+                                                          T ~ County))
+
+
+hw_distinct %>% filter (is.na(health_facility))
+
+
+hw_distinct <- hw_distinct %>%
+  mutate (District = case_when(health_facility == "Janzon Clinic" ~ "Cavalla",
+                                                            health_facility == "Barkedu Clinic" ~ "Voinjama",
+                                                              health_facility == "Tellewoyan Memorial Hospital" ~ "Voinjama",
+                                                              health_facility == "Harbel Health Center" ~ "Firestone",
+                                                              health_facility == "Cotton Tree Health Center" ~ "Firestone",
+                                                              health_facility == "Martha Tubman Memorial Hospital" ~ "Tchien",
+                                                              T ~ District))
+
+hw_distinct <-  hw_distinct %>% mutate (health_facility = case_when(health_facility == ".  Other" ~ "Kumah Clinic",
+                                                    T ~ health_facility))
+
+
+##
 
 # still need to disaggregate on topics from 1 to 37
 
 
-##
 
 supervisor <- REDRESS_DATA[37:50] %>% 
   pivot_longer(cols = ends_with("_sc"),names_to = "percent_scale",values_to = "percent_value")

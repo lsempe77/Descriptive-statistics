@@ -265,19 +265,12 @@ page2 %>% select(c(1,62,8,20:25,63,64)) %>% # filtering by empty sex
 
 # page 3 is about lab
 
-# page3 <- read_csv("C:/Users/lucas/Desktop/RedCap/REDRESS_DATA_LABELS_2022-06-10_2158.csv") # page 3
-# 
-# variable.names (page3)[1:6]
-# 
-# # there is no data!!!
-# 
-# table (page3$X26..Did.this.patient.have.specimen.s..collected.Only.show.rest.of.survey.if.this.is.YES.)
-# 
-# 
-# page3 %>% 
-#   filter (X26..Did.this.patient.have.specimen.s..collected.Only.show.rest.of.survey.if.this.is.YES. == "A. Yes")
-# 
-# page3 %>% 
-#   filter (X26..Did.this.patient.have.specimen.s..collected.Only.show.rest.of.survey.if.this.is.YES. == "B. No")
-# 
-# page3 %>% filter (!is.na(X26.1..Date.first.specimen.s..taken.))
+page3 <- read_csv("C:/Users/lucas/Desktop/RedCap/REDRESS_DATA_LABELS_2022-06-10_2158.csv") # page 3
+
+variable.names (page3)[1:12]
+
+# there is no data!!!
+
+page3 <- page3 %>% filter (`26. Did this patient have specimen(s) collected{Only show rest of survey if this is YES}` == "A. Yes")
+
+page3 %>% filter (!is.na(`26.1  Date first specimen(s) taken`))

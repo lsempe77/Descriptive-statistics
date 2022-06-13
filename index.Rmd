@@ -2,7 +2,7 @@
 title: "REDRESS: Baseline data collection"
 subtitle: "Initial exploration"
 author: 
-  - "Lucas Sempe"
+  - "Lucas Sempe & Yan Ding"
 date: '`r Sys.Date()`'
 output:
   xaringan::moon_reader:
@@ -50,9 +50,9 @@ source("Health_Facilities_pages_1_2_3.R")
 
 .right-column[
 
-During May 2022, 7 member of the REDRESS Liberia collected data from health facilities, health workers and patients across 3 counties.
+During May 2022, 8 member of the REDRESS Liberia collected data from health facilities, health workers and patients across 3 counties.
 
-Data was collected from 56 health facilities: 44 clinics, 8 health centers and 4 hospital
+Data was collected from 56 health facilities: 44 clinics, 8 health centers and 4 hospitals
 
 6 health facilities provide surgical procedure for hydrocele
 ]
@@ -195,7 +195,7 @@ ggplotly(plot2,tooltip = c("health_facility", "n"))
 
 
 ---
-## Health workers
+## Health workers (from HFs data)
 
 .left-column[
 1430 health workers were identified across 56 health facilities.
@@ -224,7 +224,7 @@ knitr::kable(hfs.unique %>% group_by(County,District) %>%
 ```
 ]
 ---
-## Health workers
+## Health workers (from HFs data)
 
 
 ```{r eval=requireNamespace("DT", quietly=TRUE)}
@@ -247,6 +247,7 @@ DT::datatable(hw, fillContainer = FALSE, options = list(pageLength = 3),
 ```
 
 ---
+## Health workers survey
 
 ```{r}
 
@@ -254,6 +255,119 @@ source("hw.R")
 
 ```
 
+.right-column[
+
+Data was collected from **344** Health workers across 3 counties and 6 districts
+
+The number of health workers varies between 90 (Voinjama, Lofa) to 25 (Cavalla, Grand Gedeh)
+
+At county level: Lofa - 184, Margibi - 100, Grand Gedeh - 80
+
+]
+
+
+.left-column[
+```{r}
+
+knitr::kable(hw_distinct %>% group_by(County, District) %>% tally(), format = 'html')
+
+```
+]
+
+
+---
+## Health workers survey
+
+
+.left-column[
+**Highest number of surveys**
+
+Martha Tubman Memorial Hospital (Tchien, GG) - 45 surveys
+
+Cotton Tree Health Center (Firestone, Margibi) - 27 surveys
+
+Foya Boma Hospital (Foya, Lofa) - 21 surveys
+
+Tellewoyan Memorial Hospital (Voinjama, Lofa) - 21 surveys
+
+Zeeworth Clinic (Mambah-Kaba, Margibi) - 19 surveys
+
+Janzon Clinic (Cavalla, GG) - 13 surveys
+
+]
+
+.right-column[
+```{r fig.width=9, fig.height=6.5}
+
+
+hw_hf<-hw_distinct %>% group_by(County, District,health_facility) %>% 
+  tally() %>%
+  arrange(n)
+
+
+p.hw<-hw_hf %>% ungroup %>%
+  mutate(health_facility = fct_reorder(.f=health_facility,
+              .x = n, .fun = max, na.rm = T)) %>% 
+  ggplot() +
+           geom_point(aes(health_facility,n, colour=District)) + 
+  facet_wrap(~County) + theme_light() + theme (axis.text.x = element_blank())+
+  xlab("Health Facilities")
+  
+ggplotly(p.hw,tooltip = c("health_facility", "n"))
+
+```
+]
+
+---
+## Health workers survey
+
+.left-column[
+
+CHA, CHV   -                                            188
+
+Nurse (Nurse assistant, and Midwifery)   -               56
+
+OIC (Screeners & Surveillance Officer)    -              35
+
+Pharmacist (Dispenser)              -                    19
+
+CHSS                               -                     11
+
+Lab Technicians (Lab aid, and Diagnosis officer)    -    11
+
+General Practitioner (PA, MD, and Clinical Director)  -   6
+
+Data Manager (M&E Officer, Data Clarke)            -      1
+
+Others                                  -                17
+]
+
+.right-column[
+```{r fig.width=8, fig.height=5}
+
+hw_hf_post<-hw_distinct %>% group_by(County, District,health_facility,
+                                `3.  What is your professional title?`) %>% 
+  tally() %>%
+  arrange(n) %>% rename (Job=`3.  What is your professional title?`)
+
+p.hw_post<-hw_hf_post %>% ungroup %>%
+  mutate(Job = fct_reorder(.f=Job,
+              .x = n, .fun = max, na.rm = T)) %>% 
+  ggplot() +
+           geom_boxplot(aes(Job,n, colour=District)) + theme_light() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, size=7)) +
+  facet_wrap(~County) + xlab("")
+
+p.hw_post
+  
+#ggplotly(p.hw_post,tooltip = c("Job", "n"))
+
+```
+]
+
+
+---
+## Other data
 
 ```{r}
 
@@ -261,6 +375,6 @@ source("patients.R")
 
 ```
 
-## Final commments
+- 1 observation on page 3 of the Health Facility tool (lab) - with incomplete data
 
-There was no data on page 3 of the Health Facility tool (lab)
+- 8 patients from Voinjama: 4 with BU and 4 with Hydrocele
